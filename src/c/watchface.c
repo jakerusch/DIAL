@@ -15,45 +15,81 @@ static double step_count;
 static char *char_current_steps;
 static bool charging;
 
-//////////////////////
-// draw minute hand //
-//////////////////////
-static const GPathInfo MINUTE_HAND_POINTS = {
+static const GPathInfo MINUTE_HAND_POINTS =  {
   5, (GPoint []) {
-    {5, 0},
-    {-5, 0},
-    {-4, -64},
-    {0, -70},
-    {4, -64}
+    {6, 0},
+    {-6, 0},
+    {-6, -60},
+    {0, -66},
+    {6, -60}
   }
 };
 static const GPathInfo MINUTE_HAND_FILLER = {
   4, (GPoint []) {
-    {2, 0},
-    {-2, 0},
-    {-2, -60},
-    {2, -60}
+    {7, 0},
+    {-7, 0},
+    {-7, -15},
+    {7, -15}
   }
 };
 
-////////////////////
-// draw hour hand //
-////////////////////
+// //////////////////////
+// // draw minute hand //
+// //////////////////////
+// static const GPathInfo MINUTE_HAND_POINTS = {
+//   5, (GPoint []) {
+//     {5, 0},
+//     {-5, 0},
+//     {-4, -64},
+//     {0, -70},
+//     {4, -64}
+//   }
+// };
+// static const GPathInfo MINUTE_HAND_FILLER = {
+//   4, (GPoint []) {
+//     {2, 0},
+//     {-2, 0},
+//     {-2, -60},
+//     {2, -60}
+//   }
+// };
+
+// ////////////////////
+// // draw hour hand //
+// ////////////////////
+// static const GPathInfo HOUR_HAND_POINTS = {
+//   5, (GPoint []) {
+//     {5, 0},
+//     {-5, 0},
+//     {-4, -48}, 
+//     {0, -54},
+//     {4, -48}
+//   }
+// };
+// static const GPathInfo HOUR_HAND_FILLER = {
+//   4, (GPoint []) {
+//     {2, 0},
+//     {-2, 0},
+//     {-2, -44},
+//     {2, -44}
+//   }
+// };
+
 static const GPathInfo HOUR_HAND_POINTS = {
   5, (GPoint []) {
-    {5, 0},
-    {-5, 0},
-    {-4, -48}, 
-    {0, -54},
-    {4, -48}
+    {7, 0},
+    {-7, 0},
+    {-7, -39},
+    {0, -45},
+    {7, -39}
   }
 };
 static const GPathInfo HOUR_HAND_FILLER = {
   4, (GPoint []) {
-    {2, 0},
-    {-2, 0},
-    {-2, -44},
-    {2, -44}
+    {8, 0},
+    {-8, 0},
+    {-8, -15},
+    {8, -15}
   }
 };
 
@@ -139,16 +175,16 @@ static void dial_update_proc(Layer *layer, GContext *ctx) {
     graphics_draw_line(ctx, tick_mark_end, tick_mark_start);  
   } // end of loop 
   
-  // draw center circle
-  // circle overlay
-  graphics_fill_circle(ctx, center, 7);
+//   // draw center circle
+//   // circle overlay
+//   graphics_fill_circle(ctx, center, 7);
   
-  // outline circle overlay
-  graphics_draw_circle(ctx, center, 7);
+//   // outline circle overlay
+//   graphics_draw_circle(ctx, center, 7);
   
-  // dot in the middle
-  graphics_context_set_fill_color(ctx, GColorBlack);
-  graphics_fill_circle(ctx, center, 1);    
+//   // dot in the middle
+//   graphics_context_set_fill_color(ctx, GColorBlack);
+//   graphics_fill_circle(ctx, center, 1);    
   
   // draw box for day and date on right of watch
   GRect temp_rect = GRect(87, 77, 43, 13);
@@ -197,26 +233,26 @@ static void health_update_proc(Layer *layer, GContext *ctx) {
 //   graphics_fill_radial(ctx, bounds, GOvalScaleModeFitCircle, 2, DEG_TO_TRIGANGLE(0), DEG_TO_TRIGANGLE(360));
 }
 
-////////////////////////////////////////////////////////////
-// draw center circle that will show when hands disappear //
-////////////////////////////////////////////////////////////
-static void draw_center_circle(Layer *layer, GContext *ctx) {
-  GRect bounds = layer_get_bounds(layer);
-  GPoint center = grect_center_point(&bounds); 
+// ////////////////////////////////////////////////////////////
+// // draw center circle that will show when hands disappear //
+// ////////////////////////////////////////////////////////////
+// static void draw_center_circle(Layer *layer, GContext *ctx) {
+//   GRect bounds = layer_get_bounds(layer);
+//   GPoint center = grect_center_point(&bounds); 
   
-  // switch colors for center circle
-//   graphics_context_set_fill_color(ctx, GColorWhite);
+//   // switch colors for center circle
+//   graphics_context_set_fill_color(ctx, GColorBlack);
   
   // circle overlay
-  graphics_fill_circle(ctx, center, 7);
+//   graphics_fill_circle(ctx, center, 6);
   
   // outline circle overlay
-  graphics_draw_circle(ctx, center, 7);
+//   graphics_draw_circle(ctx, center, 7);
   
-  // dot in the middle
-  graphics_context_set_fill_color(ctx, GColorBlack);
-  graphics_fill_circle(ctx, center, 1);  
-}
+//   // dot in the middle
+//   graphics_context_set_fill_color(ctx, GColorBlack);
+//   graphics_fill_circle(ctx, center, 1);  
+// }
 
 /////////////////////////////////
 // draw hands and update ticks //
@@ -236,12 +272,12 @@ static void ticks_update_proc(Layer *layer, GContext *ctx) {
   
   // draw minute hand
   gpath_rotate_to(s_minute_arrow, TRIG_MAX_ANGLE * t->tm_min / 60);
-  gpath_draw_filled(ctx, s_minute_arrow);
+//   gpath_draw_filled(ctx, s_minute_arrow);
   gpath_draw_outline(ctx, s_minute_arrow);
 
   // draw hour hand
   gpath_rotate_to(s_hour_arrow, (TRIG_MAX_ANGLE * (((t->tm_hour % 12) * 6) + (t->tm_min / 10))) / (12 * 6));
-  gpath_draw_filled(ctx, s_hour_arrow);
+//   gpath_draw_filled(ctx, s_hour_arrow);
   gpath_draw_outline(ctx, s_hour_arrow);
   
   // switch color for fillers
@@ -251,25 +287,25 @@ static void ticks_update_proc(Layer *layer, GContext *ctx) {
   // draw minute filler
   gpath_rotate_to(s_minute_filler, TRIG_MAX_ANGLE * t->tm_min / 60);
   gpath_draw_filled(ctx, s_minute_filler);
-  gpath_draw_outline(ctx, s_minute_filler);
+//   gpath_draw_outline(ctx, s_minute_filler);
   
   // draw hour filler
   gpath_rotate_to(s_hour_filler, (TRIG_MAX_ANGLE * (((t->tm_hour % 12) * 6) + (t->tm_min / 10))) / (12 * 6));
   gpath_draw_filled(ctx, s_hour_filler);
-  gpath_draw_outline(ctx, s_hour_filler);
+//   gpath_draw_outline(ctx, s_hour_filler);
 
   // switch colors for center circle
-  graphics_context_set_fill_color(ctx, GColorWhite);
+//   graphics_context_set_fill_color(ctx, GColorWhite);
   
   // circle overlay
   graphics_fill_circle(ctx, center, 7);
   
-  // outline circle overlay
-  graphics_draw_circle(ctx, center, 7);
+//   // outline circle overlay
+//   graphics_draw_circle(ctx, center, 7);
   
-  // dot in the middle
-  graphics_context_set_fill_color(ctx, GColorBlack);
-  graphics_fill_circle(ctx, center, 1);
+//   // dot in the middle
+//   graphics_context_set_fill_color(ctx, GColorBlack);
+//   graphics_fill_circle(ctx, center, 1);
 }
 
 //////////////////////
