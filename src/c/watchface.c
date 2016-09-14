@@ -220,7 +220,7 @@ static void battery_update_proc(Layer *layer, GContext *ctx) {
   graphics_fill_rect(ctx, GRect(33, 76, 3, 1), 0, GCornerNone);  
   
   // set visibility of charging icon
-  layer_set_hidden(bitmap_layer_get_layer(s_charging_bitmap_layer), charging);
+  layer_set_hidden(bitmap_layer_get_layer(s_charging_bitmap_layer), !charging);
 }
 
 //////////////////////////
@@ -272,12 +272,12 @@ static void ticks_update_proc(Layer *layer, GContext *ctx) {
   
   // draw minute hand
   gpath_rotate_to(s_minute_arrow, TRIG_MAX_ANGLE * t->tm_min / 60);
-//   gpath_draw_filled(ctx, s_minute_arrow);
+  gpath_draw_filled(ctx, s_minute_arrow);
   gpath_draw_outline(ctx, s_minute_arrow);
 
   // draw hour hand
   gpath_rotate_to(s_hour_arrow, (TRIG_MAX_ANGLE * (((t->tm_hour % 12) * 6) + (t->tm_min / 10))) / (12 * 6));
-//   gpath_draw_filled(ctx, s_hour_arrow);
+  gpath_draw_filled(ctx, s_hour_arrow);
   gpath_draw_outline(ctx, s_hour_arrow);
   
   // switch color for fillers
@@ -321,7 +321,8 @@ static void main_window_load(Window *window) {
   // register button clicks
   window_set_click_config_provider(window, click_config_provider);
   
-  s_font = fonts_get_system_font(FONT_KEY_GOTHIC_14);
+//   s_font = fonts_get_system_font(FONT_KEY_GOTHIC_14);
+  s_font = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_ULTRALIGHT_10));
 
   // create canvas layer for dial
   s_dial_layer = layer_create(bounds);
@@ -334,7 +335,8 @@ static void main_window_load(Window *window) {
   layer_add_child(s_dial_layer, s_temp_circle);
   
   // create temp text
-  s_temp_layer = text_layer_create(GRect(60, 28, 24, 16));
+//   s_temp_layer = text_layer_create(GRect(60, 28, 24, 16));
+  s_temp_layer = text_layer_create(GRect(60, 32, 24, 16));
   text_layer_set_background_color(s_temp_layer, GColorClear);
   text_layer_set_text_alignment(s_temp_layer, GTextAlignmentCenter);
   text_layer_set_font(s_temp_layer, s_font);
@@ -375,20 +377,23 @@ static void main_window_load(Window *window) {
     
   // create shoe icon
   s_health_bitmap = gbitmap_create_with_resource(RESOURCE_ID_SHOE_BLACK_ICON);
-  s_health_bitmap_layer = bitmap_layer_create(GRect(60, 123, 24, 16));
+//   s_health_bitmap_layer = bitmap_layer_create(GRect(60, 123, 24, 16));
+  s_health_bitmap_layer = bitmap_layer_create(GRect(60, 121, 24, 16));
   bitmap_layer_set_compositing_mode(s_health_bitmap_layer, GCompOpSet);
   bitmap_layer_set_bitmap(s_health_bitmap_layer, s_health_bitmap); 
   layer_add_child(s_dial_layer, bitmap_layer_get_layer(s_health_bitmap_layer));
   
   // Day Text
-  s_day_text_layer = text_layer_create(GRect(88, 74, 26, 14));
+//   s_day_text_layer = text_layer_create(GRect(88, 74, 26, 14));
+  s_day_text_layer = text_layer_create(GRect(88, 77, 26, 14));
   text_layer_set_background_color(s_day_text_layer, GColorClear);
   text_layer_set_text_alignment(s_day_text_layer, GTextAlignmentCenter);
   text_layer_set_font(s_day_text_layer, s_font);
   layer_add_child(s_dial_layer, text_layer_get_layer(s_day_text_layer));
   
   // Date text
-  s_date_text_layer = text_layer_create(GRect(113, 74, 16, 14));
+//   s_date_text_layer = text_layer_create(GRect(113, 74, 16, 14));
+  s_date_text_layer = text_layer_create(GRect(113, 77, 16, 14));
   text_layer_set_background_color(s_date_text_layer, GColorClear);
   text_layer_set_text_alignment(s_date_text_layer, GTextAlignmentCenter);
   text_layer_set_font(s_date_text_layer, s_font);
@@ -526,7 +531,8 @@ static void load_icons() {
       s_weather_bitmap = gbitmap_create_with_resource(RESOURCE_ID_PARTLY_CLOUDY_NIGHT_BLACK_ICON);
     }
   // populate weather icon
-  s_weather_bitmap_layer = bitmap_layer_create(GRect(60, 46, 24, 16));
+//   s_weather_bitmap_layer = bitmap_layer_create(GRect(60, 46, 24, 16));
+  s_weather_bitmap_layer = bitmap_layer_create(GRect(60, 44, 24, 16));
   bitmap_layer_set_compositing_mode(s_weather_bitmap_layer, GCompOpSet);  
   bitmap_layer_set_bitmap(s_weather_bitmap_layer, s_weather_bitmap); 
   layer_add_child(s_dial_layer, bitmap_layer_get_layer(s_weather_bitmap_layer)); 

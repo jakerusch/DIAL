@@ -18,6 +18,12 @@
         "resources": {
             "media": [
                 {
+                    "file": "fonts/ULTRALIGHT.ttf",
+                    "name": "ULTRALIGHT_10",
+                    "targetPlatforms": null,
+                    "type": "font"
+                },
+                {
                     "file": "images/SCREENSHOT.png",
                     "menuIcon": true,
                     "name": "SCREENSHOT",
