@@ -8,7 +8,7 @@
             "location",
             "health"
         ],
-        "displayName": "DIAL",
+        "displayName": "Dial",
         "enableMultiJS": true,
         "messageKeys": [
             "KEY_TEMP",
@@ -17,6 +17,13 @@
         "projectType": "native",
         "resources": {
             "media": [
+                {
+                    "file": "fonts/ARCON_FONT.ttf",
+                    "name": "ARCON_FONT_10",
+                    "targetPlatforms": null,
+                    "trackingAdjust": -1,
+                    "type": "font"
+                },
                 {
                     "file": "fonts/ULTRALIGHT.ttf",
                     "name": "ULTRALIGHT_10",

@@ -1,6 +1,23 @@
+////////////////////////////////////////////
+// Written by Jacob Rusch
+// 10/3/2016
+// code for analog watch dial
+// only for Dorite
+////////////////////////////////////////////
+
 #include <pebble.h>
+
+///////////////////////
+// weather variables //
+///////////////////////
 #define KEY_TEMP
 #define KEY_ICON
+
+////////////////////
+// font variables //
+////////////////////
+#define WORD_FONT RESOURCE_ID_ULTRALIGHT_10
+#define NUMBER_FONT RESOURCE_ID_ARCON_FONT_10
 
 static Window *s_main_window;
 static Layer *s_dial_layer, *s_hands_layer, *s_temp_circle, *s_battery_circle, *s_health_circle;
@@ -8,13 +25,16 @@ static TextLayer *s_temp_layer, *s_health_layer, *s_day_text_layer, *s_date_text
 static GBitmap *s_weather_bitmap, *s_health_bitmap, *s_bluetooth_bitmap, *s_charging_bitmap, *s_bluetooth_bitmap;
 static BitmapLayer *s_weather_bitmap_layer, *s_health_bitmap_layer, *s_bluetooth_bitmap_layer, *s_charging_bitmap_layer, *s_bluetooth_bitmap_layer;
 static GPath *s_minute_arrow, *s_hour_arrow, *s_minute_filler, *s_hour_filler;
-static int buf=8, battery_percent, step_goal=100;
-static GFont s_font;
-static char icon_layer_buf[32];
+static int buf=8, battery_percent, step_goal=10000;
+static GFont s_word_font, s_number_font;
+static char icon_buf[32];
 static double step_count;
 static char *char_current_steps;
 static bool charging;
 
+////////////////////////////////
+// points to draw minute hand //
+////////////////////////////////
 static const GPathInfo MINUTE_HAND_POINTS =  {
   5, (GPoint []) {
     {6, 0},
@@ -33,48 +53,9 @@ static const GPathInfo MINUTE_HAND_FILLER = {
   }
 };
 
-// //////////////////////
-// // draw minute hand //
-// //////////////////////
-// static const GPathInfo MINUTE_HAND_POINTS = {
-//   5, (GPoint []) {
-//     {5, 0},
-//     {-5, 0},
-//     {-4, -64},
-//     {0, -70},
-//     {4, -64}
-//   }
-// };
-// static const GPathInfo MINUTE_HAND_FILLER = {
-//   4, (GPoint []) {
-//     {2, 0},
-//     {-2, 0},
-//     {-2, -60},
-//     {2, -60}
-//   }
-// };
-
-// ////////////////////
-// // draw hour hand //
-// ////////////////////
-// static const GPathInfo HOUR_HAND_POINTS = {
-//   5, (GPoint []) {
-//     {5, 0},
-//     {-5, 0},
-//     {-4, -48}, 
-//     {0, -54},
-//     {4, -48}
-//   }
-// };
-// static const GPathInfo HOUR_HAND_FILLER = {
-//   4, (GPoint []) {
-//     {2, 0},
-//     {-2, 0},
-//     {-2, -44},
-//     {2, -44}
-//   }
-// };
-
+//////////////////////////////
+// points to draw hour hand //
+//////////////////////////////
 static const GPathInfo HOUR_HAND_POINTS = {
   5, (GPoint []) {
     {7, 0},
@@ -115,10 +96,6 @@ static void select_click_handler(ClickRecognizerRef recognizer, void *context) {
   hide_hands();
   app_timer_register(5000, show_hands, NULL);
 }
-
-// static void select_long_click_release_handler(ClickRecognizerRef recognizer, void *context) {
-//   APP_LOG(APP_LOG_LEVEL_DEBUG, "select_long_click_release_handler");
-// }
 
 ///////////////////
 // assign clicks //
@@ -175,23 +152,13 @@ static void dial_update_proc(Layer *layer, GContext *ctx) {
     graphics_draw_line(ctx, tick_mark_end, tick_mark_start);  
   } // end of loop 
   
-//   // draw center circle
-//   // circle overlay
-//   graphics_fill_circle(ctx, center, 7);
-  
-//   // outline circle overlay
-//   graphics_draw_circle(ctx, center, 7);
-  
-//   // dot in the middle
-//   graphics_context_set_fill_color(ctx, GColorBlack);
-//   graphics_fill_circle(ctx, center, 1);    
-  
   // draw box for day and date on right of watch
-  GRect temp_rect = GRect(87, 77, 43, 13);
+  GRect temp_rect = GRect(87, 77, 44, 13);
   graphics_draw_round_rect(ctx, temp_rect, 3);
+  
   // dividing line in date round rectange
-  GPoint start_temp_line = GPoint(114, 77);
-  GPoint end_temp_line = GPoint(114, 88);
+  GPoint start_temp_line = GPoint(113, 77);
+  GPoint end_temp_line = GPoint(113, 88);
   graphics_draw_line(ctx, start_temp_line, end_temp_line);    
 }
 
@@ -230,29 +197,7 @@ static void health_update_proc(Layer *layer, GContext *ctx) {
   GRect bounds = GRect(54, 104, 36, 36);
   graphics_context_set_fill_color(ctx, GColorBlack);
   graphics_fill_radial(ctx, bounds, GOvalScaleModeFitCircle, 2, DEG_TO_TRIGANGLE(0), DEG_TO_TRIGANGLE((step_count/step_goal)*360));
-//   graphics_fill_radial(ctx, bounds, GOvalScaleModeFitCircle, 2, DEG_TO_TRIGANGLE(0), DEG_TO_TRIGANGLE(360));
 }
-
-// ////////////////////////////////////////////////////////////
-// // draw center circle that will show when hands disappear //
-// ////////////////////////////////////////////////////////////
-// static void draw_center_circle(Layer *layer, GContext *ctx) {
-//   GRect bounds = layer_get_bounds(layer);
-//   GPoint center = grect_center_point(&bounds); 
-  
-//   // switch colors for center circle
-//   graphics_context_set_fill_color(ctx, GColorBlack);
-  
-  // circle overlay
-//   graphics_fill_circle(ctx, center, 6);
-  
-  // outline circle overlay
-//   graphics_draw_circle(ctx, center, 7);
-  
-//   // dot in the middle
-//   graphics_context_set_fill_color(ctx, GColorBlack);
-//   graphics_fill_circle(ctx, center, 1);  
-// }
 
 /////////////////////////////////
 // draw hands and update ticks //
@@ -287,25 +232,17 @@ static void ticks_update_proc(Layer *layer, GContext *ctx) {
   // draw minute filler
   gpath_rotate_to(s_minute_filler, TRIG_MAX_ANGLE * t->tm_min / 60);
   gpath_draw_filled(ctx, s_minute_filler);
-//   gpath_draw_outline(ctx, s_minute_filler);
   
   // draw hour filler
   gpath_rotate_to(s_hour_filler, (TRIG_MAX_ANGLE * (((t->tm_hour % 12) * 6) + (t->tm_min / 10))) / (12 * 6));
   gpath_draw_filled(ctx, s_hour_filler);
-//   gpath_draw_outline(ctx, s_hour_filler);
-
-  // switch colors for center circle
-//   graphics_context_set_fill_color(ctx, GColorWhite);
   
   // circle overlay
   graphics_fill_circle(ctx, center, 7);
   
-//   // outline circle overlay
-//   graphics_draw_circle(ctx, center, 7);
-  
-//   // dot in the middle
-//   graphics_context_set_fill_color(ctx, GColorBlack);
-//   graphics_fill_circle(ctx, center, 1);
+  // dot in the middle
+  graphics_context_set_fill_color(ctx, GColorWhite);
+  graphics_fill_circle(ctx, center, 1);
 }
 
 //////////////////////
@@ -316,13 +253,13 @@ static void main_window_load(Window *window) {
   GRect bounds = layer_get_bounds(window_layer);
   
   // set background color
-  window_set_background_color(s_main_window, GColorBlack);
+  window_set_background_color(s_main_window, GColorBlack); // default GColorWhite
   
   // register button clicks
   window_set_click_config_provider(window, click_config_provider);
   
-//   s_font = fonts_get_system_font(FONT_KEY_GOTHIC_14);
-  s_font = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_ULTRALIGHT_10));
+  s_word_font = fonts_load_custom_font(resource_get_handle(WORD_FONT));
+  s_number_font = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_ARCON_FONT_10));
 
   // create canvas layer for dial
   s_dial_layer = layer_create(bounds);
@@ -335,12 +272,10 @@ static void main_window_load(Window *window) {
   layer_add_child(s_dial_layer, s_temp_circle);
   
   // create temp text
-//   s_temp_layer = text_layer_create(GRect(60, 28, 24, 16));
-  s_temp_layer = text_layer_create(GRect(60, 32, 24, 16));
+  s_temp_layer = text_layer_create(GRect(60, 31, 24, 16));
   text_layer_set_background_color(s_temp_layer, GColorClear);
   text_layer_set_text_alignment(s_temp_layer, GTextAlignmentCenter);
-  text_layer_set_font(s_temp_layer, s_font);
-  text_layer_set_text(s_temp_layer, "100");
+  text_layer_set_font(s_temp_layer, s_number_font);
   layer_add_child(s_dial_layer, text_layer_get_layer(s_temp_layer));
   
   // create battery layer
@@ -363,11 +298,10 @@ static void main_window_load(Window *window) {
   layer_add_child(s_dial_layer, bitmap_layer_get_layer(s_bluetooth_bitmap_layer));       
   
   // create health layer text
-  s_health_layer = text_layer_create(GRect(54, 108, 36, 16));
+  s_health_layer = text_layer_create(GRect(54, 107, 36, 16));
   text_layer_set_background_color(s_health_layer, GColorClear);
   text_layer_set_text_alignment(s_health_layer, GTextAlignmentCenter);
-  text_layer_set_font(s_health_layer, s_font);
-//   text_layer_set_text(s_health_layer, "5000");
+  text_layer_set_font(s_health_layer, s_number_font);
   layer_add_child(s_dial_layer, text_layer_get_layer(s_health_layer));  
   
   // create health layer circle
@@ -377,36 +311,29 @@ static void main_window_load(Window *window) {
     
   // create shoe icon
   s_health_bitmap = gbitmap_create_with_resource(RESOURCE_ID_SHOE_BLACK_ICON);
-//   s_health_bitmap_layer = bitmap_layer_create(GRect(60, 123, 24, 16));
   s_health_bitmap_layer = bitmap_layer_create(GRect(60, 121, 24, 16));
   bitmap_layer_set_compositing_mode(s_health_bitmap_layer, GCompOpSet);
   bitmap_layer_set_bitmap(s_health_bitmap_layer, s_health_bitmap); 
   layer_add_child(s_dial_layer, bitmap_layer_get_layer(s_health_bitmap_layer));
   
   // Day Text
-//   s_day_text_layer = text_layer_create(GRect(88, 74, 26, 14));
   s_day_text_layer = text_layer_create(GRect(88, 77, 26, 14));
   text_layer_set_background_color(s_day_text_layer, GColorClear);
   text_layer_set_text_alignment(s_day_text_layer, GTextAlignmentCenter);
-  text_layer_set_font(s_day_text_layer, s_font);
+  text_layer_set_font(s_day_text_layer, s_word_font);
   layer_add_child(s_dial_layer, text_layer_get_layer(s_day_text_layer));
   
   // Date text
-//   s_date_text_layer = text_layer_create(GRect(113, 74, 16, 14));
-  s_date_text_layer = text_layer_create(GRect(113, 77, 16, 14));
+  s_date_text_layer = text_layer_create(GRect(115, 77, 16, 14));
   text_layer_set_background_color(s_date_text_layer, GColorClear);
   text_layer_set_text_alignment(s_date_text_layer, GTextAlignmentCenter);
-  text_layer_set_font(s_date_text_layer, s_font);
+  text_layer_set_font(s_date_text_layer, s_number_font);
   layer_add_child(s_dial_layer, text_layer_get_layer(s_date_text_layer));  
   
   // create canvas layer for hands
   s_hands_layer = layer_create(bounds);
   layer_set_update_proc(s_hands_layer, ticks_update_proc);
   layer_add_child(window_layer, s_hands_layer);
-  
-//   // draw center circle
-//   layer_set_update_proc(s_dial_layer, draw_center_circle);
-//   layer_add_child(window_layer, s_dial_layer);  
 }
 
 ///////////////////////
@@ -436,6 +363,19 @@ static void update_time() {
 static void tick_handler(struct tm *tick_time, TimeUnits units_changed) {
   layer_mark_dirty(s_hands_layer);
   update_time();
+  
+  // Get weather update every 30 minutes
+  if(tick_time->tm_min % 30 == 0) {
+    // Begin dictionary
+    DictionaryIterator *iter;
+    app_message_outbox_begin(&iter);
+  
+    // Add a key-value pair
+    dict_write_uint8(iter, 0, 0);
+  
+    // Send the message!
+    app_message_outbox_send();
+  }  
 }
 
 /////////////////////////////////////
@@ -498,6 +438,11 @@ static void main_window_unload(Window *window) {
   gbitmap_destroy(s_bluetooth_bitmap);
   gbitmap_destroy(s_charging_bitmap);
   gbitmap_destroy(s_bluetooth_bitmap);
+  bitmap_layer_destroy(s_weather_bitmap_layer);
+  bitmap_layer_destroy(s_health_bitmap_layer);
+  bitmap_layer_destroy(s_bluetooth_bitmap_layer);
+  bitmap_layer_destroy(s_charging_bitmap_layer);
+  bitmap_layer_destroy(s_bluetooth_bitmap_layer);
   gpath_destroy(s_minute_arrow);
   gpath_destroy(s_hour_arrow);
   gpath_destroy(s_minute_filler);
@@ -509,29 +454,28 @@ static void main_window_unload(Window *window) {
 //////////////////////////////////////
 static void load_icons() {
   // populate icon variable
-    if(strcmp(icon_layer_buf, "clear-day")==0) {
+    if(strcmp(icon_buf, "clear-day")==0) {
       s_weather_bitmap = gbitmap_create_with_resource(RESOURCE_ID_CLEAR_SKY_DAY_BLACK_ICON);  
-    } else if(strcmp(icon_layer_buf, "clear-night")==0) {
+    } else if(strcmp(icon_buf, "clear-night")==0) {
       s_weather_bitmap = gbitmap_create_with_resource(RESOURCE_ID_CLEAR_SKY_NIGHT_BLACK_ICON);
-    }else if(strcmp(icon_layer_buf, "rain")==0) {
+    }else if(strcmp(icon_buf, "rain")==0) {
       s_weather_bitmap = gbitmap_create_with_resource(RESOURCE_ID_RAIN_BLACK_ICON);
-    } else if(strcmp(icon_layer_buf, "snow")==0) {
+    } else if(strcmp(icon_buf, "snow")==0) {
       s_weather_bitmap = gbitmap_create_with_resource(RESOURCE_ID_SNOW_BLACK_ICON);
-    } else if(strcmp(icon_layer_buf, "sleet")==0) {
+    } else if(strcmp(icon_buf, "sleet")==0) {
       s_weather_bitmap = gbitmap_create_with_resource(RESOURCE_ID_SLEET_BLACK_ICON);
-    } else if(strcmp(icon_layer_buf, "wind")==0) {
+    } else if(strcmp(icon_buf, "wind")==0) {
       s_weather_bitmap = gbitmap_create_with_resource(RESOURCE_ID_WIND_BLACK_ICON);
-    } else if(strcmp(icon_layer_buf, "fog")==0) {
+    } else if(strcmp(icon_buf, "fog")==0) {
       s_weather_bitmap = gbitmap_create_with_resource(RESOURCE_ID_FOG_BLACK_ICON);
-    } else if(strcmp(icon_layer_buf, "cloudy")==0) {
+    } else if(strcmp(icon_buf, "cloudy")==0) {
       s_weather_bitmap = gbitmap_create_with_resource(RESOURCE_ID_CLOUDY_BLACK_ICON);
-    } else if(strcmp(icon_layer_buf, "partly-cloudy-day")==0) {
+    } else if(strcmp(icon_buf, "partly-cloudy-day")==0) {
       s_weather_bitmap = gbitmap_create_with_resource(RESOURCE_ID_PARTLY_CLOUDY_DAY_BLACK_ICON);
-    } else if(strcmp(icon_layer_buf, "partly-cloudy-night")==0) {
+    } else if(strcmp(icon_buf, "partly-cloudy-night")==0) {
       s_weather_bitmap = gbitmap_create_with_resource(RESOURCE_ID_PARTLY_CLOUDY_NIGHT_BLACK_ICON);
     }
   // populate weather icon
-//   s_weather_bitmap_layer = bitmap_layer_create(GRect(60, 46, 24, 16));
   s_weather_bitmap_layer = bitmap_layer_create(GRect(60, 44, 24, 16));
   bitmap_layer_set_compositing_mode(s_weather_bitmap_layer, GCompOpSet);  
   bitmap_layer_set_bitmap(s_weather_bitmap_layer, s_weather_bitmap); 
@@ -544,8 +488,6 @@ static void load_icons() {
 static void inbox_received_callback(DictionaryIterator *iterator, void *context) {
   // Store incoming information
   static char temp_buf[8];
-  static char icon_buf[32];
-  static char temp_layer_buf[32];
 
   // Read tuples for data
   Tuple *temp_tuple = dict_find(iterator, MESSAGE_KEY_KEY_TEMP);
@@ -555,13 +497,11 @@ static void inbox_received_callback(DictionaryIterator *iterator, void *context)
   if(temp_tuple && icon_tuple) {
     
     // temp
-    snprintf(temp_buf, sizeof(temp_buf), "%d", (int)temp_tuple->value->int32);
-    snprintf(temp_layer_buf, sizeof(temp_layer_buf), "%s", temp_buf);
-    text_layer_set_text(s_temp_layer, temp_layer_buf);
+    snprintf(temp_buf, sizeof(temp_buf), "%d°", (int)temp_tuple->value->int32);
+    text_layer_set_text(s_temp_layer, temp_buf);
 
     // icon
     snprintf(icon_buf, sizeof(icon_buf), "%s", icon_tuple->value->cstring);
-    snprintf(icon_layer_buf, sizeof(icon_layer_buf), "%s", icon_buf);    
   }  
   
   load_icons();
@@ -638,8 +578,8 @@ static void init() {
   app_message_register_outbox_sent(outbox_sent_callback);  
   
   // Open AppMessage for weather callbacks
-  const int inbox_size = 64;
-  const int outbox_size = 64;
+  const int inbox_size = 40;
+  const int outbox_size = 40;
   app_message_open(inbox_size, outbox_size);  
   APP_LOG(APP_LOG_LEVEL_DEBUG, "Clock show_clock_window");  
 }

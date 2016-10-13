@@ -1,4 +1,4 @@
-var myAPIKey = '';
+var myAPIKey = '8c2aa1a0aa2bdccb0a9b6ef3e71da862';
 
 var xhrRequest = function (url, type, callback) {
   var xhr = new XMLHttpRequest();
@@ -10,12 +10,8 @@ var xhrRequest = function (url, type, callback) {
 };
 
 function locationSuccess(pos) {
-  // to fake current lat/lon for testing
-  pos.coords.latitude = '29.5411941';
-  pos.coords.longitude = '-98.5760687';
-
   // Construct URL
-  var weatherUrl = 'https://api.forecast.io/forecast/' + myAPIKey + '/' + pos.coords.latitude + ',' + pos.coords.longitude;
+  var weatherUrl = 'https://api.darksky.net/forecast/' + myAPIKey + '/' + pos.coords.latitude + ',' + pos.coords.longitude;
   
   // get forecast through dark sky
   xhrRequest(weatherUrl, 'GET', 
