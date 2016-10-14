@@ -88,21 +88,31 @@ static void show_hands() {
   layer_set_hidden(s_hands_layer, false);
 }
 
-/////////////////////////////////////////////////
-// select click                                //
-// hides hands for 5 seconds, then shows again //
-/////////////////////////////////////////////////
-static void select_click_handler(ClickRecognizerRef recognizer, void *context) {
-  hide_hands();
-  app_timer_register(5000, show_hands, NULL);
+static void tap_handler(AccelAxisType axis, int32_t direction) {
+  if(direction > 0) {
+    hide_hands();
+    app_timer_register(5000, show_hands, NULL);
+  } else {
+    show_hands();
+  }
 }
 
-///////////////////
-// assign clicks //
-///////////////////
-static void click_config_provider(void *context) {
-  window_single_click_subscribe(BUTTON_ID_SELECT, select_click_handler);
-}
+
+// /////////////////////////////////////////////////
+// // select click                                //
+// // hides hands for 5 seconds, then shows again //
+// /////////////////////////////////////////////////
+// static void select_click_handler(ClickRecognizerRef recognizer, void *context) {
+//   hide_hands();
+//   app_timer_register(5000, show_hands, NULL);
+// }
+
+// ///////////////////
+// // assign clicks //
+// ///////////////////
+// static void click_config_provider(void *context) {
+//   window_single_click_subscribe(BUTTON_ID_SELECT, select_click_handler);
+// }
 
 /////////////////////////
 // draws dial on watch //
@@ -253,10 +263,10 @@ static void main_window_load(Window *window) {
   GRect bounds = layer_get_bounds(window_layer);
   
   // set background color
-  window_set_background_color(s_main_window, GColorBlack); // default GColorWhite
+//   window_set_background_color(s_main_window, GColorBlack); // default GColorWhite
   
   // register button clicks
-  window_set_click_config_provider(window, click_config_provider);
+//   window_set_click_config_provider(window, click_config_provider);
   
   s_word_font = fonts_load_custom_font(resource_get_handle(WORD_FONT));
   s_number_font = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_ARCON_FONT_10));
@@ -476,6 +486,9 @@ static void load_icons() {
       s_weather_bitmap = gbitmap_create_with_resource(RESOURCE_ID_PARTLY_CLOUDY_NIGHT_BLACK_ICON);
     }
   // populate weather icon
+  if(s_weather_bitmap_layer) {
+    bitmap_layer_destroy(s_weather_bitmap_layer);
+  }
   s_weather_bitmap_layer = bitmap_layer_create(GRect(60, 44, 24, 16));
   bitmap_layer_set_compositing_mode(s_weather_bitmap_layer, GCompOpSet);  
   bitmap_layer_set_bitmap(s_weather_bitmap_layer, s_weather_bitmap); 
@@ -570,6 +583,9 @@ static void init() {
     .pebble_app_connection_handler = bluetooth_callback
   });
   bluetooth_callback(connection_service_peek_pebble_app_connection());  
+  
+  // register for taps
+  accel_tap_service_subscribe(tap_handler);
   
   // Register weather callbacks
   app_message_register_inbox_received(inbox_received_callback);
