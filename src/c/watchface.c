@@ -27,7 +27,7 @@ static BitmapLayer *s_weather_bitmap_layer, *s_health_bitmap_layer, *s_bluetooth
 static GPath *s_minute_arrow, *s_hour_arrow, *s_minute_filler, *s_hour_filler;
 static int buf=8, battery_percent, step_goal=10000;
 static GFont s_word_font, s_number_font;
-static char icon_buf[32];
+static char icon_buf[64];
 static double step_count;
 static char *char_current_steps;
 static bool charging;
@@ -96,7 +96,6 @@ static void tap_handler(AccelAxisType axis, int32_t direction) {
     show_hands();
   }
 }
-
 
 // /////////////////////////////////////////////////
 // // select click                                //
@@ -355,11 +354,11 @@ static void update_time() {
   struct tm *tick_time = localtime(&temp);
   
   // write date to buffer
-  static char date_buffer[16];
+  static char date_buffer[32];
   strftime(date_buffer, sizeof(date_buffer), "%d", tick_time);
   
   // write day to buffer
-  static char day_buffer[16];
+  static char day_buffer[32];
   strftime(day_buffer, sizeof(day_buffer), "%a", tick_time);
   
   // display this time on the text layer
@@ -418,7 +417,7 @@ static void health_handler(HealthEventType event, void *context) {
     step_count = (double)health_service_sum_today(HealthMetricStepCount);
     
     // write to char_current_steps variable
-    static char health_buf[16];
+    static char health_buf[32];
     snprintf(health_buf, sizeof(health_buf), "%d", (int)step_count);
     char_current_steps = health_buf;
     text_layer_set_text(s_health_layer, char_current_steps);
@@ -434,6 +433,18 @@ static void health_handler(HealthEventType event, void *context) {
 // unload window //
 ///////////////////
 static void main_window_unload(Window *window) {
+  gbitmap_destroy(s_weather_bitmap);
+  gbitmap_destroy(s_health_bitmap);
+  gbitmap_destroy(s_bluetooth_bitmap);
+  gbitmap_destroy(s_charging_bitmap);
+  gpath_destroy(s_minute_arrow);
+  gpath_destroy(s_hour_arrow);
+  gpath_destroy(s_minute_filler);
+  gpath_destroy(s_hour_filler);  
+  bitmap_layer_destroy(s_weather_bitmap_layer);
+  bitmap_layer_destroy(s_health_bitmap_layer);
+  bitmap_layer_destroy(s_bluetooth_bitmap_layer);
+  bitmap_layer_destroy(s_charging_bitmap_layer);
   layer_destroy(s_dial_layer);
   layer_destroy(s_hands_layer);
   layer_destroy(s_temp_circle);
@@ -442,21 +453,7 @@ static void main_window_unload(Window *window) {
   text_layer_destroy(s_temp_layer);
   text_layer_destroy(s_health_layer);
   text_layer_destroy(s_day_text_layer);
-  text_layer_destroy(s_date_text_layer);
-  gbitmap_destroy(s_weather_bitmap);
-  gbitmap_destroy(s_health_bitmap);
-  gbitmap_destroy(s_bluetooth_bitmap);
-  gbitmap_destroy(s_charging_bitmap);
-  gbitmap_destroy(s_bluetooth_bitmap);
-  bitmap_layer_destroy(s_weather_bitmap_layer);
-  bitmap_layer_destroy(s_health_bitmap_layer);
-  bitmap_layer_destroy(s_bluetooth_bitmap_layer);
-  bitmap_layer_destroy(s_charging_bitmap_layer);
-  bitmap_layer_destroy(s_bluetooth_bitmap_layer);
-  gpath_destroy(s_minute_arrow);
-  gpath_destroy(s_hour_arrow);
-  gpath_destroy(s_minute_filler);
-  gpath_destroy(s_hour_filler);
+  text_layer_destroy(s_date_text_layer);  
 }
 
 //////////////////////////////////////
@@ -500,7 +497,7 @@ static void load_icons() {
 ///////////////////
 static void inbox_received_callback(DictionaryIterator *iterator, void *context) {
   // Store incoming information
-  static char temp_buf[8];
+  static char temp_buf[64];
 
   // Read tuples for data
   Tuple *temp_tuple = dict_find(iterator, MESSAGE_KEY_KEY_TEMP);
@@ -594,8 +591,8 @@ static void init() {
   app_message_register_outbox_sent(outbox_sent_callback);  
   
   // Open AppMessage for weather callbacks
-  const int inbox_size = 40;
-  const int outbox_size = 40;
+  const int inbox_size = 128;
+  const int outbox_size = 128;
   app_message_open(inbox_size, outbox_size);  
   APP_LOG(APP_LOG_LEVEL_DEBUG, "Clock show_clock_window");  
 }
@@ -604,7 +601,7 @@ static void init() {
 // de-initialize app //
 ///////////////////////
 static void deinit() {
-  window_destroy(s_main_window);
+//   window_destroy(s_main_window);
 }
 
 /////////////

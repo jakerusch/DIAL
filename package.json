@@ -18,44 +18,6 @@
         "resources": {
             "media": [
                 {
-                    "file": "fonts/ARCON_FONT.ttf",
-                    "name": "ARCON_FONT_10",
-                    "targetPlatforms": null,
-                    "trackingAdjust": -1,
-                    "type": "font"
-                },
-                {
-                    "file": "fonts/ULTRALIGHT.ttf",
-                    "name": "ULTRALIGHT_10",
-                    "targetPlatforms": null,
-                    "type": "font"
-                },
-                {
-                    "file": "images/SCREENSHOT.png",
-                    "menuIcon": true,
-                    "name": "SCREENSHOT",
-                    "targetPlatforms": null,
-                    "type": "bitmap"
-                },
-                {
-                    "file": "images/LIGHTENING_BLACK_ICON.png",
-                    "name": "LIGHTENING_BLACK_ICON",
-                    "targetPlatforms": null,
-                    "type": "bitmap"
-                },
-                {
-                    "file": "images/BLUETOOTH_DISCONNECTED_BLACK_ICON.png",
-                    "name": "BLUETOOTH_DISCONNECTED_BLACK_ICON",
-                    "targetPlatforms": null,
-                    "type": "bitmap"
-                },
-                {
-                    "file": "images/SHOE_BLACK_ICON.png",
-                    "name": "SHOE_BLACK_ICON",
-                    "targetPlatforms": null,
-                    "type": "bitmap"
-                },
-                {
                     "file": "images/WIND_BLACK_ICON.png",
                     "name": "WIND_BLACK_ICON",
                     "targetPlatforms": null,
@@ -74,6 +36,19 @@
                     "type": "bitmap"
                 },
                 {
+                    "file": "images/SHOE_BLACK_ICON.png",
+                    "name": "SHOE_BLACK_ICON",
+                    "targetPlatforms": null,
+                    "type": "bitmap"
+                },
+                {
+                    "file": "images/SCREENSHOT.png",
+                    "menuIcon": true,
+                    "name": "SCREENSHOT",
+                    "targetPlatforms": null,
+                    "type": "bitmap"
+                },
+                {
                     "file": "images/RAIN_BLACK_ICON.png",
                     "name": "RAIN_BLACK_ICON",
                     "targetPlatforms": null,
@@ -88,6 +63,12 @@
                 {
                     "file": "images/PARTLY_CLOUDY_DAY_BLACK_ICON.png",
                     "name": "PARTLY_CLOUDY_DAY_BLACK_ICON",
+                    "targetPlatforms": null,
+                    "type": "bitmap"
+                },
+                {
+                    "file": "images/LIGHTENING_BLACK_ICON.png",
+                    "name": "LIGHTENING_BLACK_ICON",
                     "targetPlatforms": null,
                     "type": "bitmap"
                 },
@@ -114,6 +95,25 @@
                     "name": "CLEAR_SKY_DAY_BLACK_ICON",
                     "targetPlatforms": null,
                     "type": "bitmap"
+                },
+                {
+                    "file": "images/BLUETOOTH_DISCONNECTED_BLACK_ICON.png",
+                    "name": "BLUETOOTH_DISCONNECTED_BLACK_ICON",
+                    "targetPlatforms": null,
+                    "type": "bitmap"
+                },
+                {
+                    "file": "fonts/ULTRALIGHT.ttf",
+                    "name": "ULTRALIGHT_10",
+                    "targetPlatforms": null,
+                    "type": "font"
+                },
+                {
+                    "file": "fonts/ARCON_FONT.ttf",
+                    "name": "ARCON_FONT_10",
+                    "targetPlatforms": null,
+                    "trackingAdjust": -1,
+                    "type": "font"
                 }
             ]
         },
@@ -121,10 +121,10 @@
         "targetPlatforms": [
             "diorite"
         ],
-        "uuid": "64a9994c-04a6-4bb3-8384-34cd96272377",
+        "uuid": "52972340-5a5e-4452-883a-80e0b3446e8b",
         "watchapp": {
             "watchface": true
         }
     },
-    "version": "1.0.0"
+    "version": "2.0.0"
 }
